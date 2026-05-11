@@ -583,7 +583,7 @@ Transform:
   m_GameObject: {fileID: 493422346}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.63362, y: 0, z: 0.49653}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -672,6 +672,8 @@ MonoBehaviour:
   doorAcceleration: 2
   generator: {fileID: 0}
   sprintPrefab: {fileID: 3098503896384130657, guid: 4b376fb330daff544b89f53fe1a71590, type: 3}
+  pressure: 0
+  lastOpenedRoomIndex: 0
 --- !u!4 &927314741
 Transform:
   m_ObjectHideFlags: 0
@@ -681,7 +683,7 @@ Transform:
   m_GameObject: {fileID: 927314739}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.63362, y: 0, z: 0.49653}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -771,7 +773,23 @@ MonoBehaviour:
     direction: 0
     spawnAtRoom: 1
     heightChange: 0
+  - room: {fileID: 7141231152133577465, guid: b4ac63eb7edd49448990f98b6397ed41, type: 3}
+    weight: 3
+    canRepeat: 0
+    direction: 0
+    spawnAtRoom: -1
+    heightChange: 0
+  sideRooms:
+  - room: {fileID: 5949442178162912746, guid: 1c05979e66ca12344adebc7592cb2b8f, type: 3}
+    weight: 1
+    canRepeat: 1
+    direction: 0
+    spawnAtRoom: 0
+    heightChange: 0
   regularDoorPrefab: {fileID: 1803904338828341667, guid: 35ac49d3a00105b4ebbc1ffa50c78825, type: 3}
+  SideRoomDoorPrefab: {fileID: 1803904338828341667, guid: 1a23f19e332de63478953f4bba63ea3d, type: 3}
+  blockedDoorPrefabs:
+  - {fileID: 1803904338828341667, guid: 2c56f8e04e41c184faac50a59f1c65c9, type: 3}
   Furniture:
   - prefab: {fileID: 1343707822989843365, guid: 6cd3a6a0dc2e6c042b3be8c99bf5112b, type: 3}
     weight: 1
@@ -781,12 +799,13 @@ MonoBehaviour:
     type: 4
   roomsPerChunk: 100
   operationsPerFrame: 25
-  cooldown: 1
+  cooldown: 0
   verboseLogging: 0
   debugDisableAllRules: 0
   debugAllowCollisions: 0
   useSeededRun: 0
   debugSeed: 0
+  playerRoomIndex: 0
   currentSeed: 0
   nodeController: {fileID: 0}
 --- !u!4 &1605654260

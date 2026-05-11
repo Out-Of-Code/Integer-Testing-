@@ -55,6 +55,7 @@
     <Compile Include="Assets\Scripts\PlayerMovementScript.cs" />
     <Compile Include="Assets\Scripts\FurnitureSpawn.cs" />
     <Compile Include="Assets\UIManager.cs" />
+    <Compile Include="Assets\Scripts\DoorInfo.cs" />
     <Compile Include="Assets\Scripts\RoomPath.cs" />
     <Compile Include="Assets\Scripts\DoorLabel.cs" />
     <Compile Include="Assets\Scripts\NodeController.cs" />

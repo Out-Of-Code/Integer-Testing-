@@ -68,10 +68,13 @@ public class RoomGenerator : MonoBehaviour
 
     [Header("Rooms")]
     public WeightedRoom[] rooms;
+    public WeightedRoom[] sideRooms;
     
     [Header("Doors")]
     [Tooltip("lmao rooms & doors")]
     public GameObject regularDoorPrefab;
+    public GameObject SideRoomDoorPrefab;
+    public GameObject[] blockedDoorPrefabs;
     
     public WeightedFurniture[] Furniture;
 
@@ -429,13 +432,49 @@ public class RoomGenerator : MonoBehaviour
         GameObject obj =
             Instantiate(data.room);
 
+        RoomInstance roomInstance =
+            obj.GetComponent<RoomInstance>();
+
+        if (roomInstance == null)
+        {
+            Debug.LogError(
+                $"Missing RoomInstance on {data.room.name}");
+
+            Destroy(obj);
+
+            return false;
+        }
+
+        if (roomInstance.entries.Count == 0 ||
+            roomInstance.exits.Count == 0)
+        {
+            Debug.LogError(
+                $"Room has no entries/exits: {data.room.name}");
+
+            Destroy(obj);
+
+            return false;
+        }
+
         Transform entry =
-            obj.transform.Find("Entry");
+            roomInstance.entries[0];
 
-        Transform exit =
-            obj.transform.Find("Exit");
+        RoomInstance.ExitData exit =
+            roomInstance.exits[
+                Random.Range(0, roomInstance.exits.Count)];
 
-        if (entry == null || exit == null)
+        roomInstance.chosenExit = exit;
+        roomInstance.unusedExits.Clear();
+
+        foreach (RoomInstance.ExitData e in roomInstance.exits)
+        {
+            if (e != exit)
+            {
+                roomInstance.unusedExits.Add(e);
+            }
+        }
+
+        if (entry == null || exit.exitPoint == null)
         {
             Debug.LogError(
                 $"Missing Entry/Exit on {data.room.name}");
@@ -475,7 +514,7 @@ public class RoomGenerator : MonoBehaviour
             return false;
         }
 
-        Commit(obj, data, exit);
+        Commit(obj, data, roomInstance);
 
         return true;
     }
@@ -524,72 +563,210 @@ public class RoomGenerator : MonoBehaviour
     // COMMIT
     // =====================================================
 
-    void Commit(
-        GameObject obj,
-        WeightedRoom data,
-        Transform exit)
+void Commit(
+    GameObject obj,
+    WeightedRoom data,
+    RoomInstance roomInstance)
+{
+    roomHistory.Add(obj);
+
+    globalRoomIndex++;
+
+    // =====================================================
+    // CORE STATE UPDATE
+    // =====================================================
+
+    lastExit = roomInstance.chosenExit.exitPoint;
+    lastRoomData = data;
+
+    ApplyDirection(data.direction);
+
+    heightBalance += Mathf.RoundToInt(data.heightChange);
+
+    RoomBounds rb =
+        obj.GetComponent<RoomBounds>();
+
+    placedRooms.Add(new PlacedRoom
     {
-        
-        roomHistory.Add(obj);
-        globalRoomIndex++;
+        obj = obj,
+        data = data,
+        bounds = rb.GetWorldBounds()
+    });
 
-        lastExit = exit;
+    // =====================================================
+    // SIDE ROOMS (they consume exits)
+    // =====================================================
 
-        lastRoomData = data;
+    HashSet<RoomInstance.ExitData> usedExits = new();
 
-        ApplyDirection(data.direction);
+    GenerateSideRooms(roomInstance, usedExits);
 
-        heightBalance +=
-            Mathf.RoundToInt(
-                data.heightChange);
+    usedExits.Add(roomInstance.chosenExit);
 
-        RoomBounds rb =
-            obj.GetComponent<RoomBounds>();
+    // =====================================================
+    // MAIN PATH DOOR
+    // =====================================================
+
+    if (roomInstance.chosenExit.doorSlot != null)
+    {
+        Instantiate(
+            regularDoorPrefab,
+            roomInstance.chosenExit.doorSlot.transform.position,
+            roomInstance.chosenExit.doorSlot.transform.rotation,
+            roomInstance.chosenExit.doorSlot.transform);
+    }
+
+    usedExits.Add(roomInstance.chosenExit);
+
+    // =====================================================
+    // BLOCKED DOORS (only truly unused exits)
+    // =====================================================
+
+    foreach (RoomInstance.ExitData exit in roomInstance.exits)
+    {
+        if (exit.doorSlot == null)
+            continue;
+
+        if (usedExits.Contains(exit))
+            continue;
+
+        GameObject prefab =
+            blockedDoorPrefabs[
+                Random.Range(0, blockedDoorPrefabs.Length)];
+
+        Instantiate(
+            prefab,
+            exit.doorSlot.transform.position,
+            exit.doorSlot.transform.rotation,
+            exit.doorSlot.transform);
+    }
+
+    // =====================================================
+    // FURNITURE
+    // =====================================================
+
+    if (roomInstance != null)
+    {
+        roomInstance.GenerateFurniture(Furniture);
+    }
+
+    // =====================================================
+    // LABELS
+    // =====================================================
+
+    DoorLabel[] labels =
+        obj.GetComponentsInChildren<DoorLabel>();
+
+    foreach (DoorLabel label in labels)
+    {
+        label.SetNumber(roomHistory.Count);
+    }
+
+    // =====================================================
+    // CONTROLLER HOOK
+    // =====================================================
+
+    if (nodeController != null)
+    {
+        nodeController.OnRoomGenerated(globalRoomIndex);
+    }
+
+    // =====================================================
+    // DOOR STATE TAGGING
+    // =====================================================
+
+    Door[] doors = obj.GetComponentsInChildren<Door>();
+
+    foreach (var d in doors)
+    {
+        d.roomIndex = globalRoomIndex;
+    }
+}
+void GenerateSideRooms(
+    RoomInstance parentRoom,
+    HashSet<RoomInstance.ExitData> usedExits)
+{
+    foreach (RoomInstance.ExitData exit in parentRoom.unusedExits)
+    {
+        if (exit.exitPoint == null)
+            continue;
+
+        // already used by main path or another side room
+        if (usedExits.Contains(exit))
+            continue;
+
+        // chance gate
+        if (Random.value > 0.35f)
+            continue;
+
+        if (sideRooms == null || sideRooms.Length == 0)
+            return;
+
+        WeightedRoom chosen =
+            sideRooms[Random.Range(0, sideRooms.Length)];
+
+        GameObject obj =
+            Instantiate(chosen.room);
+
+        RoomInstance sideInstance =
+            obj.GetComponent<RoomInstance>();
+
+        if (sideInstance == null || sideInstance.entries.Count == 0)
+        {
+            Destroy(obj);
+            continue;
+        }
+
+        Transform entry = sideInstance.entries[0];
+
+        // align to exit
+        obj.transform.rotation =
+            exit.exitPoint.rotation *
+            Quaternion.Inverse(entry.localRotation);
+
+        obj.transform.position +=
+            exit.exitPoint.position -
+            entry.position;
+
+        Physics.SyncTransforms();
+
+        // collision check
+        if (!Validate(obj))
+        {
+            Destroy(obj);
+            continue;
+        }
+
+        // mark this exit as consumed
+        usedExits.Add(exit);
+
+        // register placement (IMPORTANT: reuse same system)
+        RoomBounds rb = obj.GetComponent<RoomBounds>();
 
         placedRooms.Add(new PlacedRoom
         {
             obj = obj,
-            data = data,
+            data = chosen,
             bounds = rb.GetWorldBounds()
         });
-        DoorSlot slot =
-            obj.GetComponentInChildren<DoorSlot>();
 
-        if (slot != null)
+        // furniture
+        sideInstance.GenerateFurniture(Furniture);
+
+        // side doors (always blocked/openable separately)
+        foreach (var sideExit in sideInstance.exits)
         {
+            if (sideExit.doorSlot == null)
+                continue;
+
             Instantiate(
-                regularDoorPrefab,
-                slot.transform.position,
-                slot.transform.rotation,
-                slot.transform);
-        }
-        RoomInstance roomInstance =
-            obj.GetComponent<RoomInstance>();
-
-        if (roomInstance != null)
-        {
-            roomInstance.GenerateFurniture(
-                Furniture);
-        }
-        DoorLabel label =
-            obj.GetComponentInChildren<DoorLabel>();
-
-        if (label != null)
-        {
-            // first room = 001, next = 002, etc.
-            label.SetNumber(roomHistory.Count);
-        }
-        if (nodeController != null)
-        {
-            nodeController.OnRoomGenerated(globalRoomIndex);
-        }
-        Door[] doors = obj.GetComponentsInChildren<Door>();
-
-        foreach (var d in doors)
-        {
-            d.roomIndex = globalRoomIndex;
+                SideRoomDoorPrefab,
+                sideExit.doorSlot.transform.position,
+                sideExit.doorSlot.transform.rotation,
+                sideExit.doorSlot.transform);
         }
     }
+}
     public void OnDoorOpened(int roomIndex)
     {
         playerRoomIndex = Mathf.Max(playerRoomIndex, roomIndex);
@@ -665,7 +842,13 @@ public class RoomGenerator : MonoBehaviour
             if (data == null) continue;
 
             lastRoomData = data;
-            lastExit = obj.transform.Find("Exit");
+            RoomInstance roomInstance =
+                obj.GetComponent<RoomInstance>();
+
+            if (roomInstance != null)
+            {
+                lastExit = roomInstance.chosenExit.exitPoint;
+            }
 
             heightBalance += Mathf.RoundToInt(data.heightChange);
 

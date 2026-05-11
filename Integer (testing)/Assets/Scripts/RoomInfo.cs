@@ -1,13 +1,26 @@
 using UnityEngine;
 using System.Collections.Generic;
-
 public class RoomInstance : MonoBehaviour
 {
+    [System.Serializable]
+    public class ExitData
+    {
+        public Transform exitPoint;
+        public DoorSlot doorSlot;
+    }
     public List<FurnitureSpawn> furnitureSpawns = new();
 
     public List<Collider> spawnedFurnitureColliders = new();
 
     public bool generatedFurniture;
+    
+    public List<Transform> entries = new();
+    public List<ExitData> exits = new();
+    
+    public List<ExitData> unusedExits = new();
+
+    [HideInInspector]
+    public ExitData chosenExit;
 
     void Awake()
     {
@@ -15,6 +28,38 @@ public class RoomInstance : MonoBehaviour
 
         furnitureSpawns.AddRange(
             GetComponentsInChildren<FurnitureSpawn>());
+
+        entries.Clear();
+        exits.Clear();
+
+        Transform entryRoot =
+            transform.Find("EntryPoints");
+
+        Transform exitRoot =
+            transform.Find("ExitPoints");
+
+        if (entryRoot != null)
+        {
+            foreach (Transform t in entryRoot)
+            {
+                entries.Add(t);
+            }
+        }
+
+        if (exitRoot != null)
+        {
+            foreach (Transform t in exitRoot)
+            {
+                ExitData data = new ExitData();
+
+                data.exitPoint = t;
+
+                data.doorSlot =
+                    t.GetComponentInChildren<DoorSlot>();
+
+                exits.Add(data);
+            }
+        }
     }
 
     // =====================================================
