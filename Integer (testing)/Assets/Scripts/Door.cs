@@ -25,6 +25,7 @@ public class Door : MonoBehaviour
     public float autoCloseDelay = 3f;
     public int roomIndex;
     public RoomGenerator generator;
+    public SPRINTController sprint;
 
     bool open;
 
@@ -44,6 +45,8 @@ public class Door : MonoBehaviour
     {
         if (generator == null)
             generator = FindFirstObjectByType<RoomGenerator>();
+        if (sprint == null)
+            sprint = FindFirstObjectByType<SPRINTController>();
         if (hinge == null)
         {
             Debug.LogError(
@@ -104,6 +107,10 @@ public class Door : MonoBehaviour
 
         StartCoroutine(
             AnimateDoor(!open));
+        if (sprint != null)
+        {
+            sprint.OnDoorOpened();
+        }
     }
 
     public void Open()

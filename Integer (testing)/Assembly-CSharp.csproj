@@ -51,6 +51,7 @@
     <Compile Include="Assets\Bootstrap.cs" />
     <Compile Include="Assets\Scripts\DoorSlot.cs" />
     <Compile Include="Assets\Scripts\RoomBounds.cs" />
+    <Compile Include="Assets\SPRINTEntity.cs" />
     <Compile Include="Assets\Scripts\PlayerMovementScript.cs" />
     <Compile Include="Assets\Scripts\FurnitureSpawn.cs" />
     <Compile Include="Assets\UIManager.cs" />

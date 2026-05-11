@@ -146,12 +146,18 @@ public class RoomGenerator : MonoBehaviour
     
     public int currentSeed;
 
+    public SPRINTController nodeController;
+
     // =====================================================
     // UNITY
     // =====================================================
 
     void Start()
     {
+        if (nodeController == null)
+        {
+            nodeController = FindObjectOfType<SPRINTController>();
+        }
         int seedToUse;
 
         if (useSeededRun)
@@ -558,6 +564,10 @@ public class RoomGenerator : MonoBehaviour
             // first room = 001, next = 002, etc.
             label.SetNumber(roomHistory.Count);
         }
+        if (nodeController != null)
+        {
+            nodeController.OnRoomGenerated(globalRoomIndex);
+        }
     }
 
     // =====================================================
@@ -641,7 +651,13 @@ public class RoomGenerator : MonoBehaviour
     // =====================================================
     // VALID ROOMS
     // =====================================================
+    public GameObject GetRoomAtIndex(int index)
+    {
+        if (index < 0 || index >= roomHistory.Count)
+            return null;
 
+        return roomHistory[index];
+    }
     List<WeightedRoom> GetValidRooms()
     {
         

@@ -16,6 +16,10 @@ public class SimpleFPSController : MonoBehaviour
     [Header("Interaction")]
     public float interactDistance = 3f;
     
+    [Header("Misc.")]
+    public bool isHidden;
+    public bool canMove = true;
+
     private CharacterController controller;
     private Vector3 velocity;
 
@@ -31,9 +35,38 @@ public class SimpleFPSController : MonoBehaviour
 
     void Update()
     {
+        HandleHide();
+
+        if (!canMove)
+            return;
+
         HandleInteraction();
         HandleMouseLook();
         HandleMovement();
+    }
+    void HandleHide()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            isHidden = !isHidden;
+
+            canMove = !isHidden;
+
+            velocity = Vector3.zero;
+
+            controller.enabled = !isHidden;
+
+            if (isHidden)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
     }
     void HandleInteraction()
     {

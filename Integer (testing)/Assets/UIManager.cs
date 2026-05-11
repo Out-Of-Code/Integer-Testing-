@@ -8,18 +8,25 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void ShowDeathScreen()
     {
         deathScreen.SetActive(true);
+    }
 
-        Cursor.lockState =
-            CursorLockMode.None;
-
-        Cursor.visible = true;
-
-        Time.timeScale = 0f;
+    public void HideDeathScreen()
+    {
+        deathScreen.SetActive(false);
     }
 }
