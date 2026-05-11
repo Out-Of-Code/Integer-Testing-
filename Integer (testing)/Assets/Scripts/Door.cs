@@ -23,9 +23,10 @@ public class Door : MonoBehaviour
     public bool autoClose;
 
     public float autoCloseDelay = 3f;
-    public int roomIndex;
     public RoomGenerator generator;
     public SPRINTController sprint;
+    
+    public int roomIndex;
 
     bool open;
 
@@ -87,30 +88,28 @@ public class Door : MonoBehaviour
 
     public void Interact()
     {
-        if (animating)
+        if (animating || locked || open)
             return;
-
-        if (locked)
-        {
-            OnLockedInteract();
-
-            return;
-        }
 
         ToggleDoor();
+
+        if (generator == null)
+            return;
+
+        int newIndex = roomIndex;
+
+        generator.SetPlayerRoom(newIndex);
+        generator.OnDoorOpened(newIndex);
+
+        sprint?.OnDoorOpened(newIndex);
     }
 
     public void ToggleDoor()
     {
-        if (animating)
+        if (animating || open)
             return;
 
-        StartCoroutine(
-            AnimateDoor(!open));
-        if (sprint != null)
-        {
-            sprint.OnDoorOpened();
-        }
+        StartCoroutine(AnimateDoor(true));
     }
 
     public void Open()

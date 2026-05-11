@@ -100,11 +100,23 @@ public class RoomGenerator : MonoBehaviour
     {
         StartSeededRun(debugSeed);
     }
+    
+    public int playerRoomIndex = 0;
 
     // =====================================================
     // INTERNAL
     // =====================================================
+    public void SetPlayerRoom(int index)
+    {
+        playerRoomIndex = Mathf.Clamp(index, 0, roomHistory.Count - 1);
+    }
 
+    public GameObject GetPlayerRoom()
+    {
+        return roomHistory.Count > playerRoomIndex
+            ? roomHistory[playerRoomIndex]
+            : null;
+    }
     class PlacedRoom
     {
         public GameObject obj;
@@ -288,6 +300,8 @@ public class RoomGenerator : MonoBehaviour
 
         generationRoutine =
             StartCoroutine(GenerationLoop());
+        
+        nodeController.ResetState();
 
         Log("HARD RESET");
     }
@@ -515,6 +529,7 @@ public class RoomGenerator : MonoBehaviour
         WeightedRoom data,
         Transform exit)
     {
+        
         roomHistory.Add(obj);
         globalRoomIndex++;
 
@@ -568,6 +583,16 @@ public class RoomGenerator : MonoBehaviour
         {
             nodeController.OnRoomGenerated(globalRoomIndex);
         }
+        Door[] doors = obj.GetComponentsInChildren<Door>();
+
+        foreach (var d in doors)
+        {
+            d.roomIndex = globalRoomIndex;
+        }
+    }
+    public void OnDoorOpened(int roomIndex)
+    {
+        playerRoomIndex = Mathf.Max(playerRoomIndex, roomIndex);
     }
 
     // =====================================================
@@ -916,4 +941,5 @@ public class RoomGenerator : MonoBehaviour
     {
         return RunState.Seed.ToString();
     }
+    
 }
