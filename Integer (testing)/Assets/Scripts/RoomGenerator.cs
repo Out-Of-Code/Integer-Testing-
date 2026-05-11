@@ -54,7 +54,21 @@ public class WeightedFurniture
 
     public FurnitureType type;
 }
+[System.Serializable]
+public class GameSettings
+{
+    public bool useSeededRun;
+    public int seed;
 
+    public int roomsPerChunk = 100;
+    public int operationsPerFrame = 25;
+    public float cooldown = 0f;
+
+    public bool debugDisableRules;
+    public bool allowCollisions;
+
+    public bool autoOpenDoors;
+}
 class GenerationNode
 {
     public List<WeightedRoom> triedRooms = new();
@@ -98,10 +112,12 @@ public class RoomGenerator : MonoBehaviour
     public bool useSeededRun;
     public int debugSeed;
     
+    public GameSettings settings;
+    
     [ContextMenu("Generate With Seed")]
     void GenerateWithSeed()
     {
-        StartSeededRun(debugSeed);
+        StartSeededRun(settings.seed);
     }
     
     public int playerRoomIndex = 0;
@@ -175,14 +191,14 @@ public class RoomGenerator : MonoBehaviour
         }
         int seedToUse;
 
-        if (useSeededRun)
-            seedToUse = debugSeed;
+        if (settings.useSeededRun)
+            seedToUse = settings.seed;
         else
             seedToUse = Random.Range(
                 int.MinValue,
                 int.MaxValue);
 
-        RunState.Init(seedToUse, useSeededRun);
+        RunState.Init(seedToUse, settings.useSeededRun);
 
         currentSeed = RunState.Seed;
 
@@ -197,7 +213,7 @@ public class RoomGenerator : MonoBehaviour
     public void GenerateNextChunk()
     {
         targetRoomCount =
-            roomHistory.Count + roomsPerChunk;
+            roomHistory.Count + settings.roomsPerChunk;
 
         if (generationRoutine != null)
             StopCoroutine(generationRoutine);
@@ -296,10 +312,10 @@ public class RoomGenerator : MonoBehaviour
 
         isBacktracking = false;
 
-        debugDisableAllRules =
+        settings.debugDisableRules =
             rulesOriginallyDisabled;
 
-        targetRoomCount = roomsPerChunk;
+        targetRoomCount = settings.roomsPerChunk;
 
         generationRoutine =
             StartCoroutine(GenerationLoop());
@@ -320,7 +336,7 @@ public class RoomGenerator : MonoBehaviour
         while (isGenerating)
         {
             for (int i = 0;
-                 i < operationsPerFrame;
+                 i < settings.operationsPerFrame;
                  i++)
             {
                 if (roomHistory.Count >=
@@ -354,10 +370,10 @@ public class RoomGenerator : MonoBehaviour
             RunState.Value();
             yield return null;
 
-            if (cooldown > 0f)
+            if (settings.cooldown > 0f)
             {
                 yield return
-                    new WaitForSeconds(cooldown);
+                    new WaitForSeconds(settings.cooldown);
             }
         }
 
@@ -372,7 +388,7 @@ public class RoomGenerator : MonoBehaviour
         {
             isBacktracking = false;
 
-            debugDisableAllRules =
+            settings.debugDisableRules =
                 rulesOriginallyDisabled;
         }
 
@@ -525,7 +541,7 @@ public class RoomGenerator : MonoBehaviour
 
     bool Validate(GameObject obj)
     {
-        if (debugAllowCollisions)
+        if (settings.allowCollisions)
             return true;
 
         RoomBounds rb =
@@ -783,10 +799,10 @@ void GenerateSideRooms(
             isBacktracking = true;
 
             rulesOriginallyDisabled =
-                debugDisableAllRules;
+                settings.debugDisableRules;
 
             // temporarily disable rules
-            debugDisableAllRules = true;
+            settings.debugDisableRules = true;
         }
 
         while (stack.Count > 0)
@@ -886,7 +902,7 @@ void GenerateSideRooms(
                 continue;
             }
 
-            if (!debugDisableAllRules)
+            if (!settings.debugDisableRules)
             {
                 // no repeat
 
@@ -1106,7 +1122,7 @@ void GenerateSideRooms(
     }
     public void StartSeededRun(int seed)
     {
-        useSeededRun = true;
+        settings.useSeededRun = true;
 
         RunState.Init(seed, true);
 
