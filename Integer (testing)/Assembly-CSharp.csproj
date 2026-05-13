@@ -50,6 +50,7 @@
     <Compile Include="Assets\Scripts\RunController.cs" />
     <Compile Include="Assets\Bootstrap.cs" />
     <Compile Include="Assets\Scripts\DoorSlot.cs" />
+    <Compile Include="Assets\Scripts\MenuUI.cs" />
     <Compile Include="Assets\Scripts\RoomBounds.cs" />
     <Compile Include="Assets\SPRINTEntity.cs" />
     <Compile Include="Assets\Scripts\PlayerMovementScript.cs" />

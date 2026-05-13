@@ -403,7 +403,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!136 &464991629
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -797,6 +797,7 @@ MonoBehaviour:
   - prefab: {fileID: 5682479701659664729, guid: b43d8e39f1d467a4f9b586ca78c30960, type: 3}
     weight: 1
     type: 4
+  PlayerPrefab: {fileID: 2571105867418743404, guid: d1f1e200b7556eb4a9b6afd1c6978076, type: 3}
   roomsPerChunk: 100
   operationsPerFrame: 25
   cooldown: 0
@@ -805,6 +806,16 @@ MonoBehaviour:
   debugAllowCollisions: 0
   useSeededRun: 0
   debugSeed: 0
+  settings:
+    useSeededRun: 0
+    seed: 0
+    roomsPerChunk: 100
+    operationsPerFrame: 25
+    cooldown: 0
+    debugDisableRules: 0
+    allowCollisions: 0
+    autoOpenDoors: 0
+    enableInteractHighlight: 0
   playerRoomIndex: 0
   currentSeed: 0
   nodeController: {fileID: 0}

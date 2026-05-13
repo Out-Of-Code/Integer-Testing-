@@ -68,6 +68,7 @@ public class GameSettings
     public bool allowCollisions;
 
     public bool autoOpenDoors;
+    public bool enableInteractHighlight;
 }
 class GenerationNode
 {
@@ -92,6 +93,7 @@ public class RoomGenerator : MonoBehaviour
     
     public WeightedFurniture[] Furniture;
 
+    public GameObject PlayerPrefab;
     [Header("Chunk Generation")]
     public int roomsPerChunk = 100;
 
@@ -178,6 +180,7 @@ public class RoomGenerator : MonoBehaviour
     public int currentSeed;
 
     public SPRINTController nodeController;
+    private bool hasGenerated;
 
     // =====================================================
     // UNITY
@@ -185,10 +188,15 @@ public class RoomGenerator : MonoBehaviour
 
     void Start()
     {
+        if (UIManager.Instance != null)
+            settings = UIManager.Instance.settings;
+        targetRoomCount = settings.roomsPerChunk;
+
         if (nodeController == null)
-        {
             nodeController = FindObjectOfType<SPRINTController>();
-        }
+    }
+    public void StartGeneration()
+    {
         int seedToUse;
 
         if (settings.useSeededRun)
@@ -202,6 +210,7 @@ public class RoomGenerator : MonoBehaviour
 
         currentSeed = RunState.Seed;
 
+        stack.Clear();
         stack.Push(new GenerationNode());
 
         GenerateNextChunk();
@@ -390,6 +399,26 @@ public class RoomGenerator : MonoBehaviour
 
             settings.debugDisableRules =
                 rulesOriginallyDisabled;
+        }
+
+        if (!hasGenerated)
+        {
+            hasGenerated = true;
+
+            GameObject player =
+                Instantiate(PlayerPrefab);
+
+            GameObject firstRoom =
+                roomHistory.Count > 0
+                    ? roomHistory[0]
+                    : null;
+
+            if (firstRoom != null)
+            {
+                player.transform.position =
+                    firstRoom.transform.position +
+                    Vector3.up * 2f;
+            }
         }
 
         Log("GENERATION COMPLETE");
@@ -615,7 +644,7 @@ void Commit(
 
     HashSet<RoomInstance.ExitData> usedExits = new();
 
-    GenerateSideRooms(roomInstance, usedExits);
+    GenerateSideRooms(obj, roomInstance, usedExits);
 
     usedExits.Add(roomInstance.chosenExit);
 
@@ -699,6 +728,7 @@ void Commit(
     }
 }
 void GenerateSideRooms(
+    GameObject parentObj,
     RoomInstance parentRoom,
     HashSet<RoomInstance.ExitData> usedExits)
 {
@@ -717,13 +747,12 @@ void GenerateSideRooms(
 
         if (sideRooms == null || sideRooms.Length == 0)
             return;
-
         WeightedRoom chosen =
             sideRooms[Random.Range(0, sideRooms.Length)];
 
         GameObject obj =
             Instantiate(chosen.room);
-
+        obj.transform.SetParent(parentObj.transform);
         RoomInstance sideInstance =
             obj.GetComponent<RoomInstance>();
 
