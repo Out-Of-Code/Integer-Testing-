@@ -25,6 +25,13 @@ public class SimpleFPSController : MonoBehaviour
 
     private bool isGrounded;
     private float xRotation = 0f;
+    
+    private InteractPrompt currentPrompt;
+    
+    public GameObject interactImageUI;
+    public float lookThreshold = 0.85f;
+    
+    private Door currentDoor;
 
     void Start()
     {
@@ -70,32 +77,53 @@ public class SimpleFPSController : MonoBehaviour
     }
     void HandleInteraction()
     {
-        if (!Input.GetKeyDown(KeyCode.E))
-            return;
+        Collider[] hits = Physics.OverlapSphere(cameraTransform.position, interactDistance);
 
-        Ray ray =
-            new Ray(
-                cameraTransform.position,
-                cameraTransform.forward);
+        Door bestDoor = null;
+        float bestDot = 0.85f;
 
-        if (Physics.Raycast(
-                ray,
-                out RaycastHit hit,
-                interactDistance))
+        foreach (var col in hits)
         {
-            Debug.Log(hit.collider.name);
+            Door door = col.GetComponentInParent<Door>();
+            if (door == null) continue;
 
-            Door door =
-                hit.collider.GetComponentInParent<Door>();
+            Vector3 dir = (door.transform.position - cameraTransform.position).normalized;
+            float dot = Vector3.Dot(cameraTransform.forward, dir);
 
-            if (door != null)
+            if (dot > bestDot)
             {
-                Debug.Log("FOUND DOOR");
-
-                door.Interact();
+                bestDot = dot;
+                bestDoor = door;
             }
         }
+
+        // 🔥 ONLY update when it changes
+        if (bestDoor != currentDoor)
+        {
+            if (currentDoor != null)
+                currentDoor.SetLookedAt(false);
+
+            currentDoor = bestDoor;
+
+            if (currentDoor != null)
+                currentDoor.SetLookedAt(true);
+        }
+
+        if (currentDoor != null && Input.GetKeyDown(KeyCode.E))
+        {
+            currentDoor.Interact();
+        }
+
+        if (currentDoor == null)
+        {
+            // ensure cleanup
+            if (currentDoor != null)
+                currentDoor.SetLookedAt(false);
+
+            currentDoor = null;
+        }
     }
+    
 
     void HandleMouseLook()
     {

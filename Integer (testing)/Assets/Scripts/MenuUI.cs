@@ -18,7 +18,7 @@ public class MenuUI : MonoBehaviour
 
     [Header("Colors")]
     public Color enabledColor = Color.green;
-    public Color disabledColor = Color.gray;
+    public Color disabledColor = Color.white;
 
     [Header("Generation")]
     public TMP_InputField roomsInput;

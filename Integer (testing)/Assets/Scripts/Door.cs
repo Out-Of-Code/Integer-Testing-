@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Door : MonoBehaviour
 {
@@ -27,6 +28,8 @@ public class Door : MonoBehaviour
     public SPRINTController sprint;
     
     public int roomIndex;
+    
+    public Image interactUI;
 
     bool open;
 
@@ -48,6 +51,8 @@ public class Door : MonoBehaviour
             generator = FindFirstObjectByType<RoomGenerator>();
         if (sprint == null)
             sprint = FindFirstObjectByType<SPRINTController>();
+        if (interactUI == null)
+            interactUI = FindFirstObjectByType<Image>();
         if (hinge == null)
         {
             Debug.LogError(
@@ -81,6 +86,12 @@ public class Door : MonoBehaviour
             open = true;
         }
     }
+    public void SetLookedAt(bool state)
+    {
+        if (interactUI != null)
+            if (open == false)
+                interactUI.gameObject.SetActive(state);
+    }
 
     // =====================================================
     // INTERACTION
@@ -106,6 +117,7 @@ public class Door : MonoBehaviour
 
     public void ToggleDoor()
     {
+        Destroy(interactUI);
         if (animating || open)
             return;
 
