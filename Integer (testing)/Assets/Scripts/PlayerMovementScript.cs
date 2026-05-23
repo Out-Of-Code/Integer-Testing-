@@ -32,7 +32,9 @@ public class SimpleFPSController : MonoBehaviour
     public float lookThreshold = 0.85f;
     
     private Door currentDoor;
-
+    public ComputerController currentComputer;
+    private ComputerController lookedComputer;
+    public bool inComputer;
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -44,7 +46,7 @@ public class SimpleFPSController : MonoBehaviour
     {
         HandleHide();
 
-        if (!canMove)
+        if (!canMove || inComputer)
             return;
 
         HandleInteraction();
@@ -80,24 +82,36 @@ public class SimpleFPSController : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(cameraTransform.position, interactDistance);
 
         Door bestDoor = null;
+        ComputerController bestComputer = null;
+
         float bestDot = 0.85f;
 
         foreach (var col in hits)
         {
-            Door door = col.GetComponentInParent<Door>();
-            if (door == null) continue;
-
-            Vector3 dir = (door.transform.position - cameraTransform.position).normalized;
+            Vector3 dir = (col.transform.position - cameraTransform.position).normalized;
             float dot = Vector3.Dot(cameraTransform.forward, dir);
 
-            if (dot > bestDot)
+            if (dot < bestDot) continue;
+
+            // DOOR CHECK
+            Door door = col.GetComponentInParent<Door>();
+            if (door != null)
             {
-                bestDot = dot;
                 bestDoor = door;
+                bestDot = dot;
+                continue;
+            }
+
+            // COMPUTER CHECK
+            ComputerInteractHitbox hit = col.GetComponent<ComputerInteractHitbox>();
+
+            if (hit != null)
+            {
+                bestComputer = hit.computer;
             }
         }
 
-        // 🔥 ONLY update when it changes
+        // DOOR logic (unchanged)
         if (bestDoor != currentDoor)
         {
             if (currentDoor != null)
@@ -114,19 +128,59 @@ public class SimpleFPSController : MonoBehaviour
             currentDoor.Interact();
         }
 
-        if (currentDoor == null)
-        {
-            // ensure cleanup
-            if (currentDoor != null)
-                currentDoor.SetLookedAt(false);
+        // COMPUTER logic
+        lookedComputer = bestComputer;
 
-            currentDoor = null;
+        if (lookedComputer != null && Input.GetKeyDown(KeyCode.E))
+        {
+            EnterComputer(lookedComputer);
         }
+    }
+    void EnterComputer(ComputerController computer)
+    {
+        Debug.Log("ENTER COMPUTER");
+
+        canMove = false;
+        inComputer = true;
+
+        controller.enabled = false;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        currentComputer = computer;
+
+        // SNAP CAMERA
+        cameraTransform.SetParent(null); // IMPORTANT: break player follow
+        cameraTransform.position = computer.CameraPoint.position;
+        cameraTransform.rotation = computer.CameraPoint.rotation;
+
+        computer.gameObject.SetActive(true);
+
+        computer.OnEnterComputer();
+    }
+    public void ExitComputerMode()
+    {
+        Debug.Log("EXIT COMPUTER");
+
+        canMove = true;
+        inComputer = false;
+
+        controller.enabled = true;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // reattach camera back to player
+        cameraTransform.SetParent(transform);
+        cameraTransform.localPosition = new Vector3(0, 1.6f, 0); // adjust if needed
+        cameraTransform.localRotation = Quaternion.identity;
     }
     
 
     void HandleMouseLook()
     {
+        if (inComputer) return;
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 

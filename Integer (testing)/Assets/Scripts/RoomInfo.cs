@@ -3,11 +3,18 @@ using System.Collections.Generic;
 public class RoomInstance : MonoBehaviour
 {
     [System.Serializable]
+    public class roomPath
+    {
+        public DoorSlot exitDoor;
+        public List<Transform> nodes;
+    }
+    [System.Serializable]
     public class ExitData
     {
         public Transform exitPoint;
         public DoorSlot doorSlot;
     }
+    public List<roomPath> paths;
     public List<FurnitureSpawn> furnitureSpawns = new();
 
     public List<Collider> spawnedFurnitureColliders = new();

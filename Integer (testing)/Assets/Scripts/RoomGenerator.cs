@@ -181,6 +181,7 @@ public class RoomGenerator : MonoBehaviour
 
     public SPRINTController nodeController;
     private bool hasGenerated;
+    private GameObject door;
 
     // =====================================================
     // UNITY
@@ -654,11 +655,12 @@ void Commit(
 
     if (roomInstance.chosenExit.doorSlot != null)
     {
-        Instantiate(
+        door = Instantiate(
             regularDoorPrefab,
             roomInstance.chosenExit.doorSlot.transform.position,
             roomInstance.chosenExit.doorSlot.transform.rotation,
             roomInstance.chosenExit.doorSlot.transform);
+        door.GetComponentInParent<Door>().roomIndex = globalRoomIndex;
     }
 
     usedExits.Add(roomInstance.chosenExit);
@@ -847,6 +849,7 @@ void GenerateSideRooms(
                 placedRooms.RemoveAll(p => p.obj == obj);
 
                 Destroy(obj);
+                ReindexRooms();
             }
 
             RebuildState();
@@ -1169,5 +1172,20 @@ void GenerateSideRooms(
     {
         return RunState.Seed.ToString();
     }
-    
+    void ReindexRooms()
+    {
+        globalRoomIndex = 0;
+
+        foreach (GameObject obj in roomHistory)
+        {
+            globalRoomIndex++;
+
+            Door[] doors = obj.GetComponentsInChildren<Door>();
+
+            foreach (var d in doors)
+            {
+                d.roomIndex = globalRoomIndex;
+            }
+        }
+    }
 }

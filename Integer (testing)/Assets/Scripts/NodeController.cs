@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SPRINTController : MonoBehaviour
@@ -15,7 +16,7 @@ public class SPRINTController : MonoBehaviour
     private GameObject activeEntity;
     
     private int lastKnownPlayerRoom = 0;
-    Transform lastPlayerRoom;
+    public Transform lastPlayerRoom;
     public float pressure;
     
     bool active;
@@ -38,17 +39,23 @@ public class SPRINTController : MonoBehaviour
             SpawnSPRINT();
             pressure = 0f;
         }
+        
     }
 
     public void OnDoorOpened(int roomIndex)
     {
+        Debug.Log("SPR.INT updated room to " + roomIndex);
+
         lastKnownPlayerRoom = roomIndex;
+
         pressure += doorAcceleration;
 
-        lastPlayerRoom = generator.GetRoomAtIndex(roomIndex)?.transform;
+        lastPlayerRoom =
+            generator.GetRoomAtIndex(roomIndex)?.transform;
     }
     void SpawnSPRINT()
     {
+        Debug.Log("Spawning SPRINT");
         if (generator == null)
             return;
 
@@ -57,21 +64,63 @@ public class SPRINTController : MonoBehaviour
         GameObject spawnRoom = generator.GetRoomAtIndex(spawnIndex);
 
         if (spawnRoom == null)
-            return;
+        {
+            spawnRoom = generator.GetRoomAtIndex(lastKnownPlayerRoom);
+            Debug.LogWarning("No spawn room found for " + spawnIndex);
+        }
 
-        Transform spawnPoint = spawnRoom.transform.Find("Entry");
+        Transform spawnPoint = spawnRoom.transform.Find("EntryPoints").Find("Entry").transform;
 
         if (spawnPoint == null)
+        {
+            Debug.LogWarning("No spawn point found for " + spawnIndex);
             return;
+        }
 
         if (activeEntity != null)
+        {
+            Debug.LogWarning("Already active, deleting active entity");
             Destroy(activeEntity);
+        }
 
         activeEntity = Instantiate(
             sprintPrefab,
             spawnPoint.position,
             spawnPoint.rotation
         );
+
+        SPR_INT sprint =
+            activeEntity.GetComponent<SPR_INT>();
+
+        if (sprint != null)
+        {
+            List<RoomInstance> rooms =
+                new List<RoomInstance>();
+
+            int endIndex = generator.GetRoomCount() - 1;
+
+            for (int i = spawnIndex; i <= endIndex; i++)
+            {
+                GameObject roomObj =
+                    generator.GetRoomAtIndex(i);
+
+                if (roomObj == null)
+                    continue;
+
+                RoomInstance instance =
+                    roomObj.GetComponent<RoomInstance>();
+
+                if (instance != null)
+                {
+                    rooms.Add(instance);
+                }
+            }
+            sprint.BuildRoute(rooms);
+        }
+        if (activeEntity != null)
+        {
+            Debug.Log("spawned ", activeEntity);
+        }
     }
     public void OnRoomGenerated(int index)
     {

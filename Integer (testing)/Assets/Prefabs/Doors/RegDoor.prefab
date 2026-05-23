@@ -438,6 +438,7 @@ GameObject:
   - component: {fileID: 4792350777337348881}
   - component: {fileID: 8269374700574109181}
   - component: {fileID: 3910073498316216642}
+  - component: {fileID: 5729165597239112194}
   m_Layer: 0
   m_Name: Hitbox
   m_TagString: Untagged
@@ -554,6 +555,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   doorScript: {fileID: 438964542844856425}
   isOpen: 0
+--- !u!114 &5729165597239112194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4806363618812810800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77f30b9b1f91f8e479cd573758af1047, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  door: {fileID: 438964542844856425}
 --- !u!1 &8484271623876456667
 GameObject:
   m_ObjectHideFlags: 0

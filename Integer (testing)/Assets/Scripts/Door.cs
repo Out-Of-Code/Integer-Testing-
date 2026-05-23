@@ -31,7 +31,7 @@ public class Door : MonoBehaviour
     
     public Image interactUI;
 
-    bool open;
+    public bool open;
 
     bool animating;
 
@@ -112,7 +112,13 @@ public class Door : MonoBehaviour
         generator.SetPlayerRoom(newIndex);
         generator.OnDoorOpened(newIndex);
 
-        sprint?.OnDoorOpened(newIndex);
+        if (sprint == null)
+            sprint = FindFirstObjectByType<SPRINTController>();
+
+        if (sprint != null)
+        {
+            sprint.OnDoorOpened(newIndex);
+        }
     }
 
     public void ToggleDoor()

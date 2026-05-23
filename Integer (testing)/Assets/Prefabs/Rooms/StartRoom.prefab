@@ -770,6 +770,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b32c0a3d447cabe4ba25c721d9b0e9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoomInstance
+  paths:
+  - exitDoor: {fileID: 6906395546156269152}
+    nodes: []
   furnitureSpawns: []
   spawnedFurnitureColliders: []
   generatedFurniture: 0
