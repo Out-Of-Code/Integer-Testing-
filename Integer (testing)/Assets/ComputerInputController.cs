@@ -73,14 +73,6 @@ public class ComputerInputController : MonoBehaviour
                 ComputerController.ComputerCommandType.Save));
         // Inside the block: if (!computer) return; if (!player.inComputer ...) return;
         // // ADD after existing key bindings:
-        if (computer.state == ComputerController.ComputerState.ReadUSB)
-        {
-            if (Input.GetKeyDown(KeyCode.Y) ||
-                Input.GetKeyDown(KeyCode.Return))
-            {
-                computer.GetComponent<ComputerUSBHandler>
-                    ()?.TryInsertSelected();
-            }
-        }
+
     }
 }
