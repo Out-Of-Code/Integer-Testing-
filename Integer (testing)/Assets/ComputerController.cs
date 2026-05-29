@@ -388,11 +388,14 @@ public class ComputerController : MonoBehaviour
 
             case ComputerState.ReadUSB:
                 readUSBScreen.SetActive(true);
+                GetComponent<ComputerUSBHandler>()?.OnEnterReadUSBScreen(); 
+                GetComponent<ComputerLoreMenu>()?.OnEnterLoreMenu(); 
                 break;
 
             case ComputerState.Save:
                 saveScreen.SetActive(true);
                 break;
+            
         }
         
 
