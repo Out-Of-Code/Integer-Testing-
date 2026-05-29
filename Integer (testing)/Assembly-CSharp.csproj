@@ -56,11 +56,11 @@
     <Compile Include="Assets\Scripts\SanityTextCorruptor.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
     <Compile Include="Assets\Scripts\InsanityController.cs" />
+    <Compile Include="Assets\Scripts\ComputerLoreMenu.cs" />
     <Compile Include="Assets\Scripts\DoorSlot.cs" />
     <Compile Include="Assets\Scripts\MenuUI.cs" />
     <Compile Include="Assets\Scripts\RoomBounds.cs" />
     <Compile Include="Assets\Scripts\PlayerMovementScript.cs" />
-    <Compile Include="Assets\Scripts\ISanityAffected.cs" />
     <Compile Include="Assets\Scripts\LoreFileManager.cs" />
     <Compile Include="Assets\Scripts\FurnitureSpawn.cs" />
     <Compile Include="Assets\Scripts\USBInventoryManager.cs" />
@@ -68,8 +68,7 @@
     <Compile Include="Assets\Scripts\SPRINTEntity.cs" />
     <Compile Include="Assets\Scripts\RoomPath.cs" />
     <Compile Include="Assets\Scripts\DoorCollider.cs" />
-    <Compile Include="Assets\Scripts\USBDriveData.cs" />
-    <Compile Include="Assets\Scripts\LoreFileData.cs" />
+    <Compile Include="Assets\Scripts\ComputerUSBHandler.cs" />
     <Compile Include="Assets\Scripts\DoorLabel.cs" />
     <Compile Include="Assets\ComputerInteractHitbox.cs" />
     <Compile Include="Assets\Scripts\NodeController.cs" />
