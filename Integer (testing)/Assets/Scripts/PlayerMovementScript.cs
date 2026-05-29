@@ -35,8 +35,12 @@ public class SimpleFPSController : MonoBehaviour
     public ComputerController currentComputer;
     private ComputerController lookedComputer;
     public bool inComputer;
+    Vector3 originalCameraLocalPos;
+    Quaternion originalCameraLocalRot;
     void Start()
     {
+        originalCameraLocalPos = cameraTransform.localPosition;
+        originalCameraLocalRot = cameraTransform.localRotation;
         controller = GetComponent<CharacterController>();
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -173,8 +177,8 @@ public class SimpleFPSController : MonoBehaviour
 
         // reattach camera back to player
         cameraTransform.SetParent(transform);
-        cameraTransform.localPosition = new Vector3(0, 1.6f, 0); // adjust if needed
-        cameraTransform.localRotation = Quaternion.identity;
+        cameraTransform.localPosition = originalCameraLocalPos;
+        cameraTransform.localRotation = originalCameraLocalRot;
     }
     
 

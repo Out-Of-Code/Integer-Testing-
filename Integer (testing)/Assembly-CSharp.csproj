@@ -54,6 +54,7 @@
     <Compile Include="Assets\Scripts\DoorInteract.cs" />
     <Compile Include="Assets\ComputerInputController.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
+    <Compile Include="Assets\Scripts\InsanityController.cs" />
     <Compile Include="Assets\Scripts\DoorSlot.cs" />
     <Compile Include="Assets\Scripts\MenuUI.cs" />
     <Compile Include="Assets\Scripts\RoomBounds.cs" />

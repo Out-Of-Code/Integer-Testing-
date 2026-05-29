@@ -16,7 +16,11 @@ public class ComputerController : MonoBehaviour
         ReadUSB,
         Save
     }
-
+    public enum USBType
+    {
+        Lore,
+        Upgrade
+    }
     public enum ComputerCommandType
     {
         Enter,
@@ -36,6 +40,20 @@ public class ComputerController : MonoBehaviour
         {
             this.type = type;
         }
+    }
+    
+    [System.Serializable]
+    public class USBData
+    {
+        public string usbName;
+        public USBType type;
+
+        [TextArea]
+        public string loreText;
+
+        public Sprite image;
+
+        public bool isWorldUpgrade;
     }
 
     public ComputerState state;
@@ -59,10 +77,20 @@ public class ComputerController : MonoBehaviour
     public Transform player;
     public Transform hiddenPoint;
     public Transform CameraPoint;
+    
+    [Header("Clean Files")]
+    public TMP_Text cleanFilesButtonText;
+    public TMP_Text insanityText;
 
+    public float cleanRate = 5f;
+
+    private InsanityController playerInsanity;
+    
+    bool isCleaningFiles;
     bool isTransitioning;
     bool isHidden;
     bool videoUnlocked;
+    public List<USBData> usbInventory;
 
     Dictionary<ComputerState,
         Dictionary<ComputerState, List<ComputerCommandType>>> links;
@@ -86,6 +114,46 @@ public class ComputerController : MonoBehaviour
 
         if (hiddenOverlay)
             hiddenOverlay.SetActive(false);
+    }
+    void Update()
+    {
+        if (playerInsanity == null)
+            playerInsanity = FindObjectOfType<InsanityController>();
+
+        if (state == ComputerState.CleanFiles)
+        {
+            UpdateCleanFilesUI();
+        }
+    }
+    void UpdateCleanFilesUI()
+    {
+        if (playerInsanity == null)
+            return;
+
+        if (insanityText != null)
+        {
+            insanityText.text = 
+                $"FILE CLUTTER: {playerInsanity.insanity / 10f:000.00}%";
+        }
+
+        if (isCleaningFiles)
+        {
+            playerInsanity.ReduceInsanity(
+                cleanRate * Time.deltaTime);
+        }
+    }
+    
+    public void ToggleCleaningFiles()
+    {
+        isCleaningFiles = !isCleaningFiles;
+
+        if (cleanFilesButtonText != null)
+        {
+            cleanFilesButtonText.text =
+                isCleaningFiles
+                    ? "STOP CLEANING"
+                    : "CLEAN FILES";
+        }
     }
 
     void BuildGraph()
@@ -155,17 +223,18 @@ public class ComputerController : MonoBehaviour
     {
         if (isTransitioning)
             return;
+        Debug.Log($"EXECUTE: {cmd.type} | FRAME: {Time.frameCount}");
 
-        Debug.Log($"CMD: {cmd.type} | STATE: {state}");
-
-        // BACK
+        // ✅ BACK ALWAYS FIRST
         if (cmd.type == ComputerCommandType.Back)
         {
             HandleBack();
             return;
         }
 
-        // MAIN MENU → SEARCH
+        Debug.Log($"CMD: {cmd.type} | STATE: {state}");
+
+        // MAIN MENU → ENTER
         if (state == ComputerState.MainMenu &&
             cmd.type == ComputerCommandType.Enter)
         {
@@ -173,7 +242,7 @@ public class ComputerController : MonoBehaviour
             return;
         }
 
-        // HIDE ACTION (not a state)
+        // HIDE
         if (state == ComputerState.SelectionMenu &&
             cmd.type == ComputerCommandType.Hide)
         {
@@ -181,20 +250,25 @@ public class ComputerController : MonoBehaviour
             return;
         }
 
-        // VIDEO LOCKED
-        if (cmd.type == ComputerCommandType.Video &&
-            !videoUnlocked)
+        // VIDEO LOCK
+        if (cmd.type == ComputerCommandType.Video && !isHidden)
         {
             ShowError("ERROR: YOU ARE NOT HIDING");
             return;
         }
-
-        // CLEAN FILES / SAVE LOCKED AFTER HIDING
+        // CLEAN FILES + USB unavailable while hiding
         if (isHidden &&
             (cmd.type == ComputerCommandType.CleanFiles ||
-             cmd.type == ComputerCommandType.Save))
+             cmd.type == ComputerCommandType.ReadUSB))
         {
             ShowError("ERROR: YOU ARE HIDING");
+            return;
+        }
+
+// SAVE disabled by default
+        if (cmd.type == ComputerCommandType.Save)
+        {
+            ShowError("ERROR: NOT IN SAFE ROOM");
             return;
         }
 
@@ -221,26 +295,39 @@ public class ComputerController : MonoBehaviour
 
         switch (state)
         {
+            
+            // Selection goes to Main
+            case ComputerState.SelectionMenu:
+                SetState(ComputerState.MainMenu);
+                break;
+            
+            
+            // Main = actual exit
             case ComputerState.MainMenu:
-
-                // cannot leave while hidden
+                // while hiding, don't allow "leave computer" flow
                 if (isHidden)
                 {
                     ShowError("ERROR: YOU ARE HIDING");
                     return;
                 }
-
+                
                 ExitComputer();
                 break;
 
-            case ComputerState.SelectionMenu:
-                SetState(ComputerState.MainMenu);
-                break;
-
+            // App pages return to selection
             case ComputerState.Video:
-            case ComputerState.CleanFiles:
             case ComputerState.ReadUSB:
             case ComputerState.Save:
+                SetState(ComputerState.SelectionMenu);
+                break;
+
+            case ComputerState.CleanFiles:
+                if (isCleaningFiles)
+                {
+                    ShowError("ERROR: CLEANING FILES");
+                    return;
+                }
+
                 SetState(ComputerState.SelectionMenu);
                 break;
         }
@@ -288,6 +375,15 @@ public class ComputerController : MonoBehaviour
 
             case ComputerState.CleanFiles:
                 cleanFilesScreen.SetActive(true);
+
+                if (cleanFilesButtonText != null)
+                {
+                    cleanFilesButtonText.text =
+                        isCleaningFiles
+                            ? "STOP CLEANING"
+                            : "CLEAN FILES";
+                }
+
                 break;
 
             case ComputerState.ReadUSB:
@@ -298,6 +394,7 @@ public class ComputerController : MonoBehaviour
                 saveScreen.SetActive(true);
                 break;
         }
+        
 
         isTransitioning = false;
     }
@@ -314,22 +411,17 @@ public class ComputerController : MonoBehaviour
 
         loadingScreen.SetActive(false);
 
-        isHidden = true;
-        videoUnlocked = true;
+        isHidden = !isHidden;
 
-        if (player != null && hiddenPoint != null)
-        {
+        if (player != null && hiddenPoint != null && isHidden == true)
             player.position = hiddenPoint.position;
-        }
-        else
-        {
-            Debug.LogWarning("Hidden point not assigned");
-        }
 
         if (hiddenOverlay)
-            hiddenOverlay.SetActive(true);
+            hiddenOverlay.SetActive(isHidden);
 
+        // IMPORTANT: do NOT treat this as a “mode state”
         state = ComputerState.SelectionMenu;
+
         selectionScreen.SetActive(true);
 
         isTransitioning = false;
@@ -375,11 +467,32 @@ public class ComputerController : MonoBehaviour
                 ComputerState.MainMenu
             )
         );
+        FindAnyObjectByType<ComputerInteractHitbox>().gameObject.SetActive(false);
     }
 
     void ExitComputer()
     {
+        if (isHidden)
+        {
+            ShowError("ERROR: YOU ARE HIDING");
+            return;
+        }
+        
+        if (state != ComputerState.MainMenu)
+            return;
+
         Debug.Log("Exit Computer");
+
+        StopAllCoroutines();
+
+        state = ComputerState.Off;
+
+        DisableAllScreens();
+
+        if (offScreen)
+            offScreen.SetActive(true);
+
+        isTransitioning = false;
 
         SimpleFPSController playerController =
             FindObjectOfType<SimpleFPSController>();
@@ -388,6 +501,7 @@ public class ComputerController : MonoBehaviour
         {
             playerController.ExitComputerMode();
         }
+        FindAnyObjectByType<ComputerInteractHitbox>().gameObject.SetActive(true);
     }
 
     Coroutine errorRoutine;
