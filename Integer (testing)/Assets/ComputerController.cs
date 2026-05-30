@@ -14,7 +14,8 @@ public class ComputerController : MonoBehaviour
         Video,
         CleanFiles,
         ReadUSB,
-        Save
+        Save,
+        FileScreen
     }
     public enum USBType
     {
@@ -46,6 +47,7 @@ public class ComputerController : MonoBehaviour
     public class USBData
     {
         public string usbName;
+
         public USBType type;
 
         [TextArea]
@@ -54,10 +56,16 @@ public class ComputerController : MonoBehaviour
         public Sprite image;
 
         public bool isWorldUpgrade;
+
+        public bool hasBeenRead;
+
+        // optional for upgrades
+        public string upgradeID;
     }
 
     public ComputerState state;
-
+    public ComputerInteractHitbox interactHitbox;
+    
     [Header("UI Screens")]
     public GameObject offScreen;
     public GameObject menuScreen;
@@ -67,7 +75,8 @@ public class ComputerController : MonoBehaviour
     public GameObject cleanFilesScreen;
     public GameObject readUSBScreen;
     public GameObject saveScreen;
-
+    public GameObject fileScreen;
+    
     [Header("Overlays")]
     public GameObject errorOverlay;
     public TMP_Text errorText;
@@ -83,13 +92,26 @@ public class ComputerController : MonoBehaviour
     public TMP_Text insanityText;
 
     public float cleanRate = 5f;
+    
+    [Header("USB UI")]
+    public Button[] usbButtons; // size = 5
+    public TMP_Text[] usbButtonTexts;
+
+    public TMP_Text usbLoreText;
+    public Image usbImage;
+
+    public Button usbActionButton;
+    public TMP_Text usbActionButtonText;
 
     private InsanityController playerInsanity;
+    
+    int currentUSBPage = 0;
+
+    const int realUSBsPerPage = 4;
     
     bool isCleaningFiles;
     bool isTransitioning;
     bool isHidden;
-    bool videoUnlocked;
     public List<USBData> usbInventory;
 
     Dictionary<ComputerState,
@@ -124,6 +146,114 @@ public class ComputerController : MonoBehaviour
         {
             UpdateCleanFilesUI();
         }
+    }
+    void RefreshUSBPage()
+    {
+        int startIndex =
+            currentUSBPage * realUSBsPerPage;
+
+        for (int i = 0; i < usbButtons.Length; i++)
+        {
+            int usbIndex = startIndex + i;
+
+            Button button = usbButtons[i];
+
+            button.onClick.RemoveAllListeners();
+
+            if (usbIndex >= usbInventory.Count)
+            {
+                button.gameObject.SetActive(false);
+                continue;
+            }
+
+            button.gameObject.SetActive(true);
+
+            USBData usb = usbInventory[usbIndex];
+
+            usbButtonTexts[i].text =
+                $"{i + 1}. {usb.usbName}";
+
+            int capturedIndex = usbIndex;
+
+            button.onClick.AddListener(() =>
+            {
+                OpenUSB(capturedIndex);
+            });
+        }
+
+        SetupNextPageButton();
+    }
+    void SetupNextPageButton()
+    {
+        int remaining =
+            usbInventory.Count -
+            ((currentUSBPage + 1)
+             * realUSBsPerPage);
+
+        bool needsNextPage = remaining > 0;
+
+        if (!needsNextPage)
+            return;
+
+        int lastIndex = usbButtons.Length - 1;
+
+        usbButtonTexts[lastIndex].text =
+            "5. NEXT PAGE";
+
+        usbButtons[lastIndex].onClick.RemoveAllListeners();
+
+        usbButtons[lastIndex].onClick.AddListener(() =>
+        {
+            currentUSBPage++;
+            RefreshUSBPage();
+        });
+    }
+    public void OpenUSB(int index)
+    {
+        USBData usb = usbInventory[index];
+
+        usb.hasBeenRead = true;
+
+        DisableAllScreens();
+
+        fileScreen.SetActive(true);
+
+        state = ComputerState.FileScreen;
+
+        if (usb.type == USBType.Lore)
+        {
+            usbLoreText.text = usb.loreText;
+
+            usbImage.sprite = usb.image;
+            usbImage.gameObject.SetActive(
+                usb.image != null);
+
+            usbActionButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            usbLoreText.text =
+                "WORLD UPGRADE DETECTED";
+
+            usbImage.gameObject.SetActive(false);
+
+            usbActionButton.gameObject.SetActive(true);
+
+            usbActionButtonText.text =
+                "UPLOAD TO WORLD";
+
+            usbActionButton.onClick.RemoveAllListeners();
+
+            usbActionButton.onClick.AddListener(() =>
+            {
+                InstallUpgrade(usb);
+            });
+        }
+    }
+    void InstallUpgrade(USBData usb)
+    {
+        Debug.Log(
+            $"INSTALLED: {usb.upgradeID}");
     }
     void UpdateCleanFilesUI()
     {
@@ -320,6 +450,9 @@ public class ComputerController : MonoBehaviour
             case ComputerState.Save:
                 SetState(ComputerState.SelectionMenu);
                 break;
+            case ComputerState.FileScreen:
+                SetState(ComputerState.ReadUSB);
+                break;
 
             case ComputerState.CleanFiles:
                 if (isCleaningFiles)
@@ -388,11 +521,19 @@ public class ComputerController : MonoBehaviour
 
             case ComputerState.ReadUSB:
                 readUSBScreen.SetActive(true);
+
+                currentUSBPage = 0;
+
+                RefreshUSBPage();
+                break;
+            case ComputerState.FileScreen:
+                fileScreen.SetActive(true);
                 break;
 
             case ComputerState.Save:
                 saveScreen.SetActive(true);
                 break;
+            
         }
         
 
@@ -454,6 +595,7 @@ public class ComputerController : MonoBehaviour
         if (cleanFilesScreen) cleanFilesScreen.SetActive(false);
         if (readUSBScreen) readUSBScreen.SetActive(false);
         if (saveScreen) saveScreen.SetActive(false);
+        if (fileScreen) fileScreen.SetActive(false);
     }
 
     public void OnEnterComputer()
@@ -467,7 +609,7 @@ public class ComputerController : MonoBehaviour
                 ComputerState.MainMenu
             )
         );
-        FindAnyObjectByType<ComputerInteractHitbox>().gameObject.SetActive(false);
+        interactHitbox.gameObject.SetActive(false);
     }
 
     void ExitComputer()
@@ -501,7 +643,7 @@ public class ComputerController : MonoBehaviour
         {
             playerController.ExitComputerMode();
         }
-        FindAnyObjectByType<ComputerInteractHitbox>().gameObject.SetActive(true);
+        interactHitbox.gameObject.SetActive(true);
     }
 
     Coroutine errorRoutine;
