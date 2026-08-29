@@ -53,6 +53,7 @@
     <Compile Include="Assets\Scripts\Highlight.cs" />
     <Compile Include="Assets\Scripts\DoorInteract.cs" />
     <Compile Include="Assets\ComputerInputController.cs" />
+    <Compile Include="Assets\Scripts\Interactable.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
     <Compile Include="Assets\Scripts\InsanityController.cs" />
     <Compile Include="Assets\Scripts\DoorSlot.cs" />
@@ -67,10 +68,12 @@
     <Compile Include="Assets\Scripts\DoorLabel.cs" />
     <Compile Include="Assets\ComputerInteractHitbox.cs" />
     <Compile Include="Assets\Scripts\NodeController.cs" />
+    <Compile Include="Assets\Scripts\InteractionManager.cs" />
     <Compile Include="Assets\Scripts\Door.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\RoomInfo.cs" />
     <Compile Include="Assets\Scripts\RoomGenerator.cs" />
+    <Compile Include="Assets\Scripts\InteractionPrompt.cs" />
     <Compile Include="Assets\Scripts\Bootstrap.cs" />
     <Compile Include="Assets\LightingManager.cs" />
     <Compile Include="Assets\DoorTrigger.cs" />
