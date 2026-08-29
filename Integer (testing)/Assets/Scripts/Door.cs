@@ -32,6 +32,8 @@ public class Door : MonoBehaviour
     public Image interactUI;
 
     public bool open;
+    
+    public UIManager MenuManager;
 
     bool animating;
 
@@ -85,12 +87,17 @@ public class Door : MonoBehaviour
 
             open = true;
         }
+        if (MenuManager == null)
+        {
+            MenuManager = FindObjectOfType<UIManager>();
+        }
     }
     public void SetLookedAt(bool state)
     {
         if (interactUI != null)
             if (open == false)
-                interactUI.gameObject.SetActive(state);
+                if (MenuManager.settings.enableInteractHighlight)
+                    interactUI.gameObject.SetActive(state);
     }
 
     // =====================================================

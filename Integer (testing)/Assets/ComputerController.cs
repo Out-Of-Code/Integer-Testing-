@@ -61,6 +61,8 @@ public class ComputerController : MonoBehaviour
 
         // optional for upgrades
         public string upgradeID;
+        
+        public bool isBroken;
     }
 
     public ComputerState state;
@@ -76,6 +78,7 @@ public class ComputerController : MonoBehaviour
     public GameObject readUSBScreen;
     public GameObject saveScreen;
     public GameObject fileScreen;
+    public Camera FeedCamera;
     
     [Header("Overlays")]
     public GameObject errorOverlay;
@@ -96,12 +99,16 @@ public class ComputerController : MonoBehaviour
     [Header("USB UI")]
     public Button[] usbButtons; // size = 5
     public TMP_Text[] usbButtonTexts;
-
+    public TMP_Text usbFilename;
     public TMP_Text usbLoreText;
     public Image usbImage;
 
     public Button usbActionButton;
     public TMP_Text usbActionButtonText;
+    
+    [Header("USB Fonts")]
+    public TMP_FontAsset silkscreenFont;
+    public TMP_FontAsset defaultFont;
 
     private InsanityController playerInsanity;
     
@@ -124,6 +131,8 @@ public class ComputerController : MonoBehaviour
 
     void Start()
     {
+        if (FeedCamera)
+            FeedCamera.enabled = false;
         state = ComputerState.Off;
 
         DisableAllScreens();
@@ -173,6 +182,9 @@ public class ComputerController : MonoBehaviour
             usbButtonTexts[i].text =
                 $"{i + 1}. {usb.usbName}";
 
+            usbButtonTexts[i].font =
+                usb.isBroken ? defaultFont : silkscreenFont;
+
             int capturedIndex = usbIndex;
 
             button.onClick.AddListener(() =>
@@ -191,7 +203,11 @@ public class ComputerController : MonoBehaviour
              * realUSBsPerPage);
 
         bool needsNextPage = remaining > 0;
-
+        
+        Debug.Log($"USB Count: {usbInventory.Count}");
+        Debug.Log($"Remaining: {remaining}");
+        Debug.Log($"Needs Next Page: {needsNextPage}");
+        
         if (!needsNextPage)
             return;
 
@@ -199,11 +215,13 @@ public class ComputerController : MonoBehaviour
 
         usbButtonTexts[lastIndex].text =
             "5. NEXT PAGE";
-
+        Debug.Log("SETTING BUTTON 5 TO NEXT PAGE");
         usbButtons[lastIndex].onClick.RemoveAllListeners();
 
         usbButtons[lastIndex].onClick.AddListener(() =>
         {
+            Debug.Log("NEXT PAGE CLICKED");
+
             currentUSBPage++;
             RefreshUSBPage();
         });
@@ -223,17 +241,22 @@ public class ComputerController : MonoBehaviour
         if (usb.type == USBType.Lore)
         {
             usbLoreText.text = usb.loreText;
+            usbFilename.text = usb.usbName;
 
             usbImage.sprite = usb.image;
             usbImage.gameObject.SetActive(
                 usb.image != null);
+            usbLoreText.font = usb.isBroken ? defaultFont : silkscreenFont;
+            usbFilename.font = usb.isBroken ? defaultFont : silkscreenFont;
 
             usbActionButton.gameObject.SetActive(false);
         }
         else
         {
-            usbLoreText.text =
-                "WORLD UPGRADE DETECTED";
+            usbFilename.text = usb.usbName;
+            usbFilename.font = usb.isBroken ? defaultFont : silkscreenFont;
+            usbLoreText.text = "WORLD UPGRADE DETECTED";
+            usbLoreText.font = usb.isBroken ? defaultFont : silkscreenFont;
 
             usbImage.gameObject.SetActive(false);
 
@@ -446,7 +469,6 @@ public class ComputerController : MonoBehaviour
 
             // App pages return to selection
             case ComputerState.Video:
-            case ComputerState.ReadUSB:
             case ComputerState.Save:
                 SetState(ComputerState.SelectionMenu);
                 break;
@@ -462,6 +484,19 @@ public class ComputerController : MonoBehaviour
                 }
 
                 SetState(ComputerState.SelectionMenu);
+                break;
+            case ComputerState.ReadUSB:
+
+                if (currentUSBPage > 0)
+                {
+                    currentUSBPage--;
+                    RefreshUSBPage();
+                }
+                else
+                {
+                    SetState(ComputerState.SelectionMenu);
+                }
+
                 break;
         }
     }
@@ -487,7 +522,8 @@ public class ComputerController : MonoBehaviour
             loadingScreen.SetActive(false);
 
         state = newState;
-
+        if (FeedCamera)
+            FeedCamera.enabled = state == ComputerState.MainMenu;
         switch (state)
         {
             case ComputerState.Off:
@@ -521,9 +557,6 @@ public class ComputerController : MonoBehaviour
 
             case ComputerState.ReadUSB:
                 readUSBScreen.SetActive(true);
-
-                currentUSBPage = 0;
-
                 RefreshUSBPage();
                 break;
             case ComputerState.FileScreen:
@@ -538,6 +571,18 @@ public class ComputerController : MonoBehaviour
         
 
         isTransitioning = false;
+    }
+
+    public void TryHide()
+    {
+        if (!isHidden)
+        {
+            StartCoroutine(HideRoutine());
+        }
+        else
+        {
+            StartCoroutine(HideErrorRoutine());
+        }
     }
 
     IEnumerator HideRoutine()

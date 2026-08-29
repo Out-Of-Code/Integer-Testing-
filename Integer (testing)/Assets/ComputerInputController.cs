@@ -107,19 +107,19 @@ public class ComputerInputController : MonoBehaviour
              ComputerController.ComputerState.ReadUSB)
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
-            computer.OpenUSB(0);
+            computer.usbButtons[0].onClick.Invoke();
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
-            computer.OpenUSB(1);
+            computer.usbButtons[1].onClick.Invoke();
 
         if (Input.GetKeyDown(KeyCode.Alpha3))
-            computer.OpenUSB(2);
+            computer.usbButtons[2].onClick.Invoke();
 
         if (Input.GetKeyDown(KeyCode.Alpha4))
-            computer.OpenUSB(3);
+            computer.usbButtons[3].onClick.Invoke();
 
         if (Input.GetKeyDown(KeyCode.Alpha5))
-            computer.OpenUSB(4);
+            computer.usbButtons[4].onClick.Invoke();
     }
 }
 }
