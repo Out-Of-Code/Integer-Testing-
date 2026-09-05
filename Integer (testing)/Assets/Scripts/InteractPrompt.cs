@@ -1,16 +1,21 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class InteractPrompt : MonoBehaviour
 {
-    public GameObject root;
+    [Header("Prompt")]
+    public string promptText = "INTERACT";
+    public KeyCode interactionKey = KeyCode.E;
+    public float activationDistance = 3f;
 
-    public void Show()
-    {
-        root.SetActive(true);
-    }
+    [Tooltip("Where the prompt appears on screen.")]
+    public Transform promptPoint;
 
-    public void Hide()
+    [Header("Interaction")]
+    public UnityEvent onInteract;
+
+    public void Interact()
     {
-        root.SetActive(false);
+        onInteract?.Invoke();
     }
 }

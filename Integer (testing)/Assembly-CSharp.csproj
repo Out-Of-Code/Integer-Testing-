@@ -60,6 +60,7 @@
     <Compile Include="Assets\Scripts\RoomBounds.cs" />
     <Compile Include="Assets\Scripts\PlayerMovementScript.cs" />
     <Compile Include="Assets\Scripts\FurnitureSpawn.cs" />
+    <Compile Include="Assets\InteractionManager.cs" />
     <Compile Include="Assets\Scripts\DoorInfo.cs" />
     <Compile Include="Assets\Scripts\SPRINTEntity.cs" />
     <Compile Include="Assets\Scripts\RoomPath.cs" />
