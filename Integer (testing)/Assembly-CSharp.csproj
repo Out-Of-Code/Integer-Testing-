@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\NodeController.cs" />
     <Compile Include="Assets\Scripts\Door.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\InteractionPromptUI.cs" />
     <Compile Include="Assets\Scripts\RoomInfo.cs" />
     <Compile Include="Assets\Scripts\RoomGenerator.cs" />
     <Compile Include="Assets\Scripts\Bootstrap.cs" />

@@ -42,6 +42,7 @@ public class Door : MonoBehaviour
     Quaternion closedRotation;
 
     Quaternion openedRotation;
+    public bool keepOpenable;
 
     // =====================================================
     // UNITY
@@ -131,10 +132,10 @@ public class Door : MonoBehaviour
     public void ToggleDoor()
     {
         Destroy(interactUI);
-        if (animating || open)
+        if (animating)
             return;
 
-        StartCoroutine(AnimateDoor(true));
+        StartCoroutine(AnimateDoor(!open));
     }
 
     public void Open()
@@ -153,6 +154,7 @@ public class Door : MonoBehaviour
 
     IEnumerator AnimateDoor(bool targetOpen)
     {
+        gameObject.GetComponentInChildren<InteractPrompt>().gameObject.SetActive(false);
         animating = true;
 
         Quaternion startRotation =
@@ -185,6 +187,18 @@ public class Door : MonoBehaviour
         open = targetOpen;
 
         animating = false;
+        if (keepOpenable)
+        {
+            // Pass 'true' to find the component even if it is inactive
+            InteractPrompt prompt = gameObject.GetComponentInChildren<InteractPrompt>(true);
+
+            // Safeguard against a NullReferenceException
+            if (prompt != null)
+            {
+                prompt.gameObject.SetActive(true);
+            }
+        }
+
     }
 
     // =====================================================
