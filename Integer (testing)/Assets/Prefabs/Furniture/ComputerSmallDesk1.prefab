@@ -6625,6 +6625,7 @@ GameObject:
   - component: {fileID: 4559222315908446349}
   - component: {fileID: 619134097896502639}
   - component: {fileID: 6065534916027430544}
+  - component: {fileID: 6958368857788691847}
   m_Layer: 0
   m_Name: Collider
   m_TagString: Untagged
@@ -6732,12 +6733,43 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6291298088894383338}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: beae38c0759e2a34eb56645b8eef1bc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
   computer: {fileID: 4571912685763874796}
+--- !u!114 &6958368857788691847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6291298088894383338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 829f15669f2007d4990f76f8bc0640a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractPrompt
+  promptText: USE
+  interactionKey: 101
+  activationDistance: 3
+  promptPoint: {fileID: 3943782548401395640}
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4571912685763874796}
+        m_TargetAssemblyTypeName: ComputerController, Assembly-CSharp
+        m_MethodName: OnEnterComputer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &6361349027397508594
 GameObject:
   m_ObjectHideFlags: 0
