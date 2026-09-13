@@ -647,6 +647,12 @@ public class ComputerController : MonoBehaviour
     {
         if (state != ComputerState.Off)
             return;
+
+        InteractPrompt prompt = GetComponentInChildren<InteractPrompt>(true);
+
+        if (prompt != null)
+            prompt.gameObject.SetActive(false);
+
         DisableAllScreens();
 
         StartCoroutine(
@@ -654,6 +660,7 @@ public class ComputerController : MonoBehaviour
                 ComputerState.MainMenu
             )
         );
+
         interactHitbox.gameObject.SetActive(false);
     }
 
@@ -673,6 +680,10 @@ public class ComputerController : MonoBehaviour
         StopAllCoroutines();
 
         state = ComputerState.Off;
+        InteractPrompt prompt = GetComponentInChildren<InteractPrompt>(true);
+
+        if (prompt != null)
+            prompt.gameObject.SetActive(true);
 
         DisableAllScreens();
 
