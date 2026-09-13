@@ -140,7 +140,7 @@ public class SimpleFPSController : MonoBehaviour
             EnterComputer(lookedComputer);
         }
     }
-    void EnterComputer(ComputerController computer)
+    public void EnterComputer(ComputerController computer)
     {
         Debug.Log("ENTER COMPUTER");
 
@@ -160,8 +160,6 @@ public class SimpleFPSController : MonoBehaviour
         cameraTransform.rotation = computer.CameraPoint.rotation;
 
         computer.gameObject.SetActive(true);
-
-        computer.OnEnterComputer();
     }
     public void ExitComputerMode()
     {

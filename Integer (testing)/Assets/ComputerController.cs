@@ -156,6 +156,14 @@ public class ComputerController : MonoBehaviour
         {
             UpdateCleanFilesUI();
         }
+        if (player == null)
+        {
+            SimpleFPSController playerController =
+                FindObjectOfType<SimpleFPSController>();
+
+            if (playerController != null)
+                player = playerController.transform;
+        }
     }
     void RefreshUSBPage()
     {
@@ -540,32 +548,45 @@ public class ComputerController : MonoBehaviour
                 break;
 
             case ComputerState.Video:
-                videoScreen.SetActive(true);
+                if (!isHidden)
+                {
+                    videoScreen.SetActive(true);
+                }
+
                 break;
 
             case ComputerState.CleanFiles:
-                cleanFilesScreen.SetActive(true);
-
-                if (cleanFilesButtonText != null)
+                if (!isHidden)
                 {
-                    cleanFilesButtonText.text =
-                        isCleaningFiles
-                            ? "STOP CLEANING"
-                            : "CLEAN FILES";
+                    cleanFilesScreen.SetActive(true);
+
+                    if (cleanFilesButtonText != null)
+                    {
+                        cleanFilesButtonText.text =
+                            isCleaningFiles
+                                ? "STOP CLEANING"
+                                : "CLEAN FILES";
+                    }
                 }
 
                 break;
 
             case ComputerState.ReadUSB:
-                readUSBScreen.SetActive(true);
-                RefreshUSBPage();
+                if (!isHidden)
+                {
+                    readUSBScreen.SetActive(true);
+                    RefreshUSBPage();
+                }
                 break;
             case ComputerState.FileScreen:
                 fileScreen.SetActive(true);
                 break;
 
             case ComputerState.Save:
-                saveScreen.SetActive(true);
+                if (!isHidden)
+                {
+                    saveScreen.SetActive(true);
+                }
                 break;
             
         }
@@ -582,7 +603,7 @@ public class ComputerController : MonoBehaviour
         }
         else
         {
-            StartCoroutine(HideErrorRoutine());
+            StartCoroutine(HideRoutine());
         }
     }
 
@@ -685,7 +706,14 @@ public class ComputerController : MonoBehaviour
                 ComputerState.MainMenu
             )
         );
+        SimpleFPSController playerController =
+            FindObjectOfType<SimpleFPSController>();
+        if (playerController != null)
+        {
+            playerController.EnterComputer(this);
+        }
     }
+    
 
     void ExitComputer()
     {
