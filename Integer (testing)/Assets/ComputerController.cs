@@ -111,6 +111,7 @@ public class ComputerController : MonoBehaviour
     public TMP_FontAsset defaultFont;
 
     private InsanityController playerInsanity;
+    public GameObject interactionObject;
     
     int currentUSBPage = 0;
 
@@ -643,15 +644,39 @@ public class ComputerController : MonoBehaviour
         if (fileScreen) fileScreen.SetActive(false);
     }
 
+    public void TryReadDoc()
+    {
+        if (!isHidden)
+        {
+            TransitionToState(ComputerState.ReadUSB);
+        }
+    }
+    public void TryClean()
+    {
+        if (!isHidden)
+        {
+            TransitionToState(ComputerState.CleanFiles);
+        }
+    }
+    public void TryVideo()
+    {
+        if (isHidden)
+        {
+            TransitionToState(ComputerState.Video);
+        }
+    }
+    public void TryBack()
+    {
+        HandleBack();
+    }
+
     public void OnEnterComputer()
     {
         if (state != ComputerState.Off)
             return;
 
-        InteractPrompt prompt = GetComponentInChildren<InteractPrompt>(true);
-
-        if (prompt != null)
-            prompt.gameObject.SetActive(false);
+        if (interactionObject != null)
+            interactionObject.SetActive(false);
 
         DisableAllScreens();
 
@@ -660,8 +685,6 @@ public class ComputerController : MonoBehaviour
                 ComputerState.MainMenu
             )
         );
-
-        interactHitbox.gameObject.SetActive(false);
     }
 
     void ExitComputer()
@@ -680,10 +703,8 @@ public class ComputerController : MonoBehaviour
         StopAllCoroutines();
 
         state = ComputerState.Off;
-        InteractPrompt prompt = GetComponentInChildren<InteractPrompt>(true);
-
-        if (prompt != null)
-            prompt.gameObject.SetActive(true);
+        if (interactionObject != null)
+            interactionObject.SetActive(true);
 
         DisableAllScreens();
 

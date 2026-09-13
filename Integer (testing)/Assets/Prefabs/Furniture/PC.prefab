@@ -1258,7 +1258,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3875856350789783916}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1994845281693279182}
+        m_TargetAssemblyTypeName: ComputerController, Assembly-CSharp
+        m_MethodName: TryReadDoc
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &925158973466293967
 GameObject:
   m_ObjectHideFlags: 0
@@ -3005,7 +3017,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8830467536661336899}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1994845281693279182}
+        m_TargetAssemblyTypeName: ComputerController, Assembly-CSharp
+        m_MethodName: TryVideo
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3282615405684950458
 GameObject:
   m_ObjectHideFlags: 0
@@ -3338,6 +3362,7 @@ MonoBehaviour:
   usbActionButtonText: {fileID: 8040781333414801336}
   silkscreenFont: {fileID: 11400000, guid: 06aa9fbdfc3a4e346b56471f5d99090b, type: 2}
   defaultFont: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  interactionObject: {fileID: 0}
   usbInventory:
   - usbName: Read me!!!
     type: 0
@@ -5595,7 +5620,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4141294011769519044}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1994845281693279182}
+        m_TargetAssemblyTypeName: ComputerController, Assembly-CSharp
+        m_MethodName: TryClean
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &6728235115158042003
 GameObject:
   m_ObjectHideFlags: 0
@@ -7029,7 +7066,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8611053873010218040}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1994845281693279182}
+        m_TargetAssemblyTypeName: ComputerController, Assembly-CSharp
+        m_MethodName: TryBack
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &8411735937373736334
 GameObject:
   m_ObjectHideFlags: 0
