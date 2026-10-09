@@ -669,26 +669,31 @@ public class ComputerController : MonoBehaviour
     {
         if (!isHidden)
         {
-            TransitionToState(ComputerState.ReadUSB);
+            StartCoroutine(TransitionToState(ComputerState.ReadUSB));
         }
     }
     public void TryClean()
     {
         if (!isHidden)
         {
-            TransitionToState(ComputerState.CleanFiles);
+            StartCoroutine(TransitionToState(ComputerState.CleanFiles));
         }
     }
     public void TryVideo()
     {
         if (isHidden)
         {
-            TransitionToState(ComputerState.Video);
+            StartCoroutine(TransitionToState(ComputerState.Video));
         }
     }
     public void TryBack()
     {
         HandleBack();
+    }
+
+    public void TrySearch()
+    {
+        StartCoroutine(TransitionToState(ComputerState.SelectionMenu));
     }
 
     public void OnEnterComputer()
