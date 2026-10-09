@@ -52,8 +52,7 @@ public class SimpleFPSController : MonoBehaviour
 
         if (!canMove || inComputer)
             return;
-
-        HandleInteraction();
+        
         HandleMouseLook();
         HandleMovement();
     }
@@ -79,65 +78,6 @@ public class SimpleFPSController : MonoBehaviour
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             }
-        }
-    }
-    void HandleInteraction()
-    {
-        Collider[] hits = Physics.OverlapSphere(cameraTransform.position, interactDistance);
-
-        Door bestDoor = null;
-        ComputerController bestComputer = null;
-
-        float bestDot = 0.85f;
-
-        foreach (var col in hits)
-        {
-            Vector3 dir = (col.transform.position - cameraTransform.position).normalized;
-            float dot = Vector3.Dot(cameraTransform.forward, dir);
-
-            if (dot < bestDot) continue;
-
-            // DOOR CHECK
-            Door door = col.GetComponentInParent<Door>();
-            if (door != null)
-            {
-                bestDoor = door;
-                bestDot = dot;
-                continue;
-            }
-
-            // COMPUTER CHECK
-            ComputerInteractHitbox hit = col.GetComponent<ComputerInteractHitbox>();
-
-            if (hit != null)
-            {
-                bestComputer = hit.computer;
-            }
-        }
-
-        // DOOR logic (unchanged)
-        if (bestDoor != currentDoor)
-        {
-            if (currentDoor != null)
-                currentDoor.SetLookedAt(false);
-
-            currentDoor = bestDoor;
-
-            if (currentDoor != null)
-                currentDoor.SetLookedAt(true);
-        }
-
-        if (currentDoor != null && Input.GetKeyDown(KeyCode.E))
-        {
-            currentDoor.Interact();
-        }
-
-        // COMPUTER logic
-        lookedComputer = bestComputer;
-
-        if (lookedComputer != null && Input.GetKeyDown(KeyCode.E))
-        {
-            EnterComputer(lookedComputer);
         }
     }
     public void EnterComputer(ComputerController computer)
