@@ -9,7 +9,7 @@ public class InteractPrompt : MonoBehaviour
     public float activationDistance = 3f;
 
     [Tooltip("Where the prompt appears on screen.")]
-    public Transform promptPoint;
+    //public Transform promptPoint;
 
     [Header("Interaction")]
     public UnityEvent onInteract;

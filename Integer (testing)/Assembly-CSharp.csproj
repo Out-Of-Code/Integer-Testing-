@@ -53,6 +53,7 @@
     <Compile Include="Assets\Scripts\Highlight.cs" />
     <Compile Include="Assets\ComputerInputController.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
+    <Compile Include="Assets\Scripts\DrawerMoveScript.cs" />
     <Compile Include="Assets\Scripts\InsanityController.cs" />
     <Compile Include="Assets\Scripts\DoorSlot.cs" />
     <Compile Include="Assets\Scripts\MenuUI.cs" />

@@ -60,9 +60,6 @@ public class InteractionPromptUI : MonoBehaviour
 
         keyText.text = "[" + prompt.interactionKey.ToString() + "]";
         promptText.text = prompt.promptText;
-
-        if (prompt.promptPoint == null)
-            return;
     }
 
     void Hide()

@@ -1475,6 +1475,9 @@ MonoBehaviour:
   - prefab: {fileID: 1343707822989843365, guid: 2530f58d2a0f1584ab52f6af6c9fde3c, type: 3}
     weight: 1
     type: 1
+  - prefab: {fileID: 1343707822989843365, guid: e5a4da7eb3870ec4b90eb35135b9512a, type: 3}
+    weight: 9999
+    type: 1
   PlayerPrefab: {fileID: 2571105867418743404, guid: d1f1e200b7556eb4a9b6afd1c6978076, type: 3}
   roomsPerChunk: 100
   operationsPerFrame: 25
