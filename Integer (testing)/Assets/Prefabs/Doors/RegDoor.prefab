@@ -71,7 +71,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: a6ae702128506bf43804b9529842f3a5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -171,7 +171,6 @@ GameObject:
   - component: {fileID: 662232245580696708}
   - component: {fileID: 438964542844856425}
   - component: {fileID: 7323533039559070722}
-  - component: {fileID: 1775315904186776888}
   m_Layer: 0
   m_Name: RegDoor
   m_TagString: Untagged
@@ -223,6 +222,7 @@ MonoBehaviour:
   interactUI: {fileID: 0}
   open: 0
   MenuManager: {fileID: 0}
+  keepOpenable: 0
 --- !u!114 &7323533039559070722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,20 +236,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorLabel
   text: {fileID: 8605181908585861213}
---- !u!114 &1775315904186776888
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1803904338828341667}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caaabe5775b68414bb161b55cab10d05, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  uiRoot: {fileID: 0}
-  rend: {fileID: 7023069371922050159}
 --- !u!1 &2765049430611666555
 GameObject:
   m_ObjectHideFlags: 0
@@ -836,7 +822,6 @@ MonoBehaviour:
   promptText: OPEN
   interactionKey: 101
   activationDistance: 3
-  promptPoint: {fileID: 7883101354495610825}
   onInteract:
     m_PersistentCalls:
       m_Calls:

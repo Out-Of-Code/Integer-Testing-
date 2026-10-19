@@ -67,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: a6ae702128506bf43804b9529842f3a5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -168,6 +168,10 @@ MonoBehaviour:
   generator: {fileID: 0}
   sprint: {fileID: 0}
   roomIndex: 0
+  interactUI: {fileID: 0}
+  open: 0
+  MenuManager: {fileID: 0}
+  keepOpenable: 0
 --- !u!1 &3991420423862444546
 GameObject:
   m_ObjectHideFlags: 0
